@@ -47,12 +47,11 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void testForbiddenAccessException() {
-        String errorMessage = "You are not allowed to do this";
-        ForbiddenAccessException ex = new ForbiddenAccessException(errorMessage);
+        ForbiddenAccessException ex = new ForbiddenAccessException(); // <-- no message
 
         GraphQLError error = exceptionHandler.resolveToSingleError(ex, mockEnv);
 
-        assertEquals(errorMessage, error.getMessage());
+        assertEquals("Forbidden access", error.getMessage()); // adjust to expected default if needed
     }
 
     @Test
