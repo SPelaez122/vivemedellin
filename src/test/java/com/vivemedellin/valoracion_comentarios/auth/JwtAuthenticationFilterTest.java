@@ -102,7 +102,7 @@ class JwtAuthenticationFilterTest {
     @Test
     void testShouldNotFilter_graphql_returnsFalse() {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRequestURI("/graphql");
+        request.setServletPath("/graphql");
 
         assertFalse(filter.shouldNotFilter(request));
     }
