@@ -49,7 +49,7 @@ class EventServiceTest {
 
     @Test
     void testGetAll() {
-        List<EventWithReviewStatsDTO> mockList = List.of(new EventWithReviewStatsDTO());
+        List<EventWithReviewStatsDTO> mockList = List.of(mock(EventWithReviewStatsDTO.class));
         when(eventRepository.findAllWithReviewStats()).thenReturn(mockList);
 
         var result = eventService.getAll();
@@ -60,7 +60,7 @@ class EventServiceTest {
 
     @Test
     void testGetById() {
-        EventWithReviewStatsDTO dto = new EventWithReviewStatsDTO();
+        EventWithReviewStatsDTO dto = mock(EventWithReviewStatsDTO.class);
         when(eventRepository.findWithReviewStats(1L)).thenReturn(dto);
 
         var result = eventService.getById(1L);
