@@ -98,6 +98,6 @@ class EventTest {
         assertEquals("Conciertos y talleres", event.getDescription());
         assertEquals(now, event.getDate());
         assertEquals("Teatro Metropolitano", event.getLocation());
-        assertEquals(price, event.getPrice());Add commentMore actions
+        assertEquals(price, event.getPrice());
     }
 }
