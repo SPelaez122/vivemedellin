@@ -20,7 +20,7 @@ class GlobalExceptionHandlerTest {
     @Mock
     private DataFetchingEnvironment mockEnv;
 
-   @BeforeEach
+    @BeforeEach
     void setUp() {
         exceptionHandler = new GlobalExceptionHandler();
         mockEnv = mock(DataFetchingEnvironment.class);
