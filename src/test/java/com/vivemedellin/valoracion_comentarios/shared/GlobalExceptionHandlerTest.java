@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import graphql.execution.ExecutionStepInfo;
+import graphql.execution.ResultPath;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -33,6 +35,12 @@ class GlobalExceptionHandlerTest {
 
         when(mockEnv.getField()).thenReturn(mockField);
         when(mockField.getSourceLocation()).thenReturn(mockLocation);
+
+        ExecutionStepInfo mockExecutionStepInfo = mock(ExecutionStepInfo.class);
+        ResultPath mockPath = ResultPath.rootPath();
+
+        when(mockEnv.getExecutionStepInfo()).thenReturn(mockExecutionStepInfo);
+        when(mockExecutionStepInfo.getPath()).thenReturn(mockPath);
     }
 
     @Test
