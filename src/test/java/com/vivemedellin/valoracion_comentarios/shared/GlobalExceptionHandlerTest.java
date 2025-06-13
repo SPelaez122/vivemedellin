@@ -69,7 +69,7 @@ class GlobalExceptionHandlerTest {
 
         GraphQLError error = exceptionHandler.resolveToSingleError(ex, mockEnv);
 
-        assertEquals("Forbidden access", error.getMessage()); // adjust if your default is different
+        assertEquals("You don't have permission to access this resource", error.getMessage());
     }
 
     @Test
