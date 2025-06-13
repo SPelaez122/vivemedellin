@@ -182,12 +182,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
-		</plugins>
-		<finalName>valoracion_comentarios</finalName>
-	</build>
-  	<build>
-   		<plugins>
-    			<plugin>
+			<plugin>
       				<groupId>org.jacoco</groupId>
      				<artifactId>jacoco-maven-plugin</artifactId>
       				<version>0.8.7</version>
@@ -211,6 +206,7 @@
        					</execution>
       				</executions>
     			</plugin>
-   		</plugins>
-  	</build>
+		</plugins>
+		<finalName>valoracion_comentarios</finalName>
+	</build>
 </project>
