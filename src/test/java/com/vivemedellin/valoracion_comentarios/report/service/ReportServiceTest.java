@@ -6,6 +6,7 @@ import com.vivemedellin.valoracion_comentarios.report.entity.Report;
 import com.vivemedellin.valoracion_comentarios.report.factory.ReportFactory;
 import com.vivemedellin.valoracion_comentarios.report.mapper.ReportMapper;
 import com.vivemedellin.valoracion_comentarios.report.repository.ReportRepository;
+import com.vivemedellin.valoracion_comentarios.report.entity.ReportReason;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +33,7 @@ class ReportServiceTest {
 
     @Test
     void createReport_shouldReturnMappedDto() {
-        CreateReportDto input = new CreateReportDto();
+        CreateReportDto input = new CreateReportDto(ReportReason.SPAM, 123L);
         Report report = new Report();
         Report savedReport = new Report();
         ReportDto expectedDto = new ReportDto();
@@ -48,6 +49,7 @@ class ReportServiceTest {
         verify(reportRepository).save(report);
         verify(reportMapper).toDto(savedReport);
     }
+
 
     @Test
     void getReportsByAdminId_shouldReturnMappedDtos() {
