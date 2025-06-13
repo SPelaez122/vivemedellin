@@ -8,6 +8,7 @@ import com.vivemedellin.valoracion_comentarios.review.mapper.ReviewMapper;
 import com.vivemedellin.valoracion_comentarios.review.repository.ReviewRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.Optional;
 
@@ -32,16 +33,22 @@ class ModerationServiceTest {
         Long reviewId = 1L;
         Review review = new Review();
         review.setId(reviewId);
-        ReviewDto reviewDto = new ReviewDto();
-        reviewDto.setId(reviewId);
+        review.setComment("Test comment");
+
+        ReviewDto expectedDto = new ReviewDto();
+        expectedDto.setId(reviewId);
+        expectedDto.setComment("Test comment");
 
         when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
-        when(reviewMapper.toDTO(review)).thenReturn(reviewDto);
+        when(reviewMapper.toDTO(review)).thenReturn(expectedDto);
 
         ReviewDto result = moderationService.deleteReview(reviewId);
 
+        assertNotNull(result);
+        assertEquals(expectedDto.getId(), result.getId());
+        assertEquals(expectedDto.getComment(), result.getComment());
+
         verify(reviewRepository).delete(review);
-        assertEquals(reviewId, result.getId());
     }
 
     @Test
@@ -58,9 +65,7 @@ class ModerationServiceTest {
         Long reviewId = 3L;
         String updatedComment = "Updated content";
 
-        UpdateReviewModerationDto dto = new UpdateReviewModerationDto();
-        dto.setReviewId(reviewId);
-        dto.setComment(updatedComment);
+        UpdateReviewModerationDto dto = new UpdateReviewModerationDto(reviewId, updatedComment);
 
         Review review = new Review();
         review.setId(reviewId);
@@ -86,9 +91,9 @@ class ModerationServiceTest {
     @Test
     void updateReview_shouldThrowNotFoundException_whenReviewNotFound() {
         Long reviewId = 4L;
-        UpdateReviewModerationDto dto = new UpdateReviewModerationDto();
-        dto.setReviewId(reviewId);
-        dto.setComment("Test");
+        String comment = "Test";
+
+        UpdateReviewModerationDto dto = new UpdateReviewModerationDto(reviewId, comment);
 
         when(reviewRepository.findById(reviewId)).thenReturn(Optional.empty());
 
