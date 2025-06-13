@@ -10,7 +10,6 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

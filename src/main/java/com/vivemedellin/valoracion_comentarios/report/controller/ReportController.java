@@ -2,7 +2,6 @@ package com.vivemedellin.valoracion_comentarios.report.controller;
 
 import com.vivemedellin.valoracion_comentarios.report.dto.CreateReportDto;
 import com.vivemedellin.valoracion_comentarios.report.dto.ReportDto;
-import com.vivemedellin.valoracion_comentarios.report.entity.ReportReason;
 import com.vivemedellin.valoracion_comentarios.report.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;

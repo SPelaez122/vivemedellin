@@ -2,6 +2,8 @@ package com.vivemedellin.valoracion_comentarios.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,11 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
+                Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
                 Claims claims = Jwts.parser()
-                        .setSigningKey(jwtSecret.getBytes())
+                        .setSigningKey(key)
                         .build()
-                        .parseClaimsJws(token)
-                        .getBody();
+                        .parseSignedClaims(token)
+                        .getPayload();
 
                 String userId = claims.getSubject();
                 Map<String, Object> userMetaData = claims.get("raw_user_meta_data", Map.class);
@@ -51,6 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception ignored) {
+                // Intentionally ignored: this block is safe to fail silently
             }
         }
 

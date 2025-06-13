@@ -34,6 +34,7 @@ public class Event {
     @JoinColumn(name = "admin_id")
     private Admin admin;
 
+    // En Event
     @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 

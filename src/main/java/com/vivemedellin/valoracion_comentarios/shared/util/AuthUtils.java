@@ -8,6 +8,10 @@ import java.util.UUID;
 
 public class AuthUtils {
 
+
+    private AuthUtils() {
+        throw new UnsupportedOperationException("Utility class should not be instantiated");
+    }
     public static UUID getUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {

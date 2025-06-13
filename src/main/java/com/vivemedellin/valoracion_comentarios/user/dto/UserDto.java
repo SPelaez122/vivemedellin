@@ -3,7 +3,6 @@ package com.vivemedellin.valoracion_comentarios.user.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;

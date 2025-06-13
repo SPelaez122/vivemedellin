@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 /**
  * DTO for {@link com.vivemedellin.valoracion_comentarios.report.entity.Report}

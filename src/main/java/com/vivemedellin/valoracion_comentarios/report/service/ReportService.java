@@ -2,7 +2,6 @@ package com.vivemedellin.valoracion_comentarios.report.service;
 
 import com.vivemedellin.valoracion_comentarios.report.dto.CreateReportDto;
 import com.vivemedellin.valoracion_comentarios.report.dto.ReportDto;
-import com.vivemedellin.valoracion_comentarios.report.entity.ReportReason;
 import com.vivemedellin.valoracion_comentarios.report.factory.ReportFactory;
 import com.vivemedellin.valoracion_comentarios.report.mapper.ReportMapper;
 import com.vivemedellin.valoracion_comentarios.report.repository.ReportRepository;

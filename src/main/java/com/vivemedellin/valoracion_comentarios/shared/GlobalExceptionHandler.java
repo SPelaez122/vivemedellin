@@ -15,14 +15,13 @@ import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import graphql.schema.DataFetchingEnvironment;
 
-import java.util.Arrays;
-
 
 @Component
 @ControllerAdvice
 public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    private final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @Override
     protected GraphQLError resolveToSingleError(@NonNull Throwable ex, @NonNull DataFetchingEnvironment env) {
@@ -39,9 +38,8 @@ public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter 
             message = "You don't have permission to access this resource";
         }else if(ex instanceof AuthenticationException){
             message = "Invalid or expired token";
-        } else{
-            logger.error(ex.getMessage());
-            logger.error(Arrays.toString(ex.getStackTrace()));
+        } else {
+            log.error("Unhandled exception", ex);
         }
 
         return GraphqlErrorBuilder.newError(env)
