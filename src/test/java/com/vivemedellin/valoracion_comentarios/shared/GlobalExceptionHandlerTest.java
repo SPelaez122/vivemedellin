@@ -17,13 +17,20 @@ import static org.mockito.Mockito.*;
 class GlobalExceptionHandlerTest {
 
     private GlobalExceptionHandler exceptionHandler;
+    @Mock
     private DataFetchingEnvironment mockEnv;
 
-    @BeforeEach
+   @BeforeEach
     void setUp() {
         exceptionHandler = new GlobalExceptionHandler();
-        mockEnv = mock(DataFetchingEnvironment.class); // mock because env is not relevant here
-    }
+        mockEnv = mock(DataFetchingEnvironment.class);
+
+        Field mockField = mock(Field.class);
+        SourceLocation mockLocation = new SourceLocation(1, 1);
+
+        when(mockEnv.getField()).thenReturn(mockField);
+        when(mockField.getSourceLocation()).thenReturn(mockLocation);
+}
 
     @Test
     void testNotFoundException() {
