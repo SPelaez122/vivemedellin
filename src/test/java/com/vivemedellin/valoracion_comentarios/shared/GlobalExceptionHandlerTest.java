@@ -3,21 +3,24 @@ package com.vivemedellin.valoracion_comentarios.shared;
 import com.vivemedellin.valoracion_comentarios.shared.exceptions.BadRequestException;
 import com.vivemedellin.valoracion_comentarios.shared.exceptions.ForbiddenAccessException;
 import com.vivemedellin.valoracion_comentarios.shared.exceptions.NotFoundException;
-
 import graphql.GraphQLError;
+import graphql.language.Field;
+import graphql.language.SourceLocation;
 import graphql.schema.DataFetchingEnvironment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
 
     private GlobalExceptionHandler exceptionHandler;
-    @Mock
     private DataFetchingEnvironment mockEnv;
 
     @BeforeEach
@@ -30,7 +33,7 @@ class GlobalExceptionHandlerTest {
 
         when(mockEnv.getField()).thenReturn(mockField);
         when(mockField.getSourceLocation()).thenReturn(mockLocation);
-}
+    }
 
     @Test
     void testNotFoundException() {
@@ -54,11 +57,11 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void testForbiddenAccessException() {
-        ForbiddenAccessException ex = new ForbiddenAccessException(); // <-- no message
+        ForbiddenAccessException ex = new ForbiddenAccessException();
 
         GraphQLError error = exceptionHandler.resolveToSingleError(ex, mockEnv);
 
-        assertEquals("Forbidden access", error.getMessage()); // adjust to expected default if needed
+        assertEquals("Forbidden access", error.getMessage()); // adjust if your default is different
     }
 
     @Test
@@ -72,7 +75,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void testAuthenticationException() {
-        AuthenticationException ex = mock(AuthenticationException.class); // mocked for simplicity
+        AuthenticationException ex = mock(AuthenticationException.class);
 
         GraphQLError error = exceptionHandler.resolveToSingleError(ex, mockEnv);
 
