@@ -10,9 +10,9 @@ import com.vivemedellin.valoracion_comentarios.review.repository.ReviewRepositor
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -30,8 +30,8 @@ class UpdateReviewHandlerTest {
 
     private AutoCloseable closeable;
 
-    private final UUID userId = UUID.randomUUID();
-    private final int reviewId = 1;
+    private final Long userId = 123L;
+    private final Long reviewId = 1L;
 
     @BeforeEach
     void setUp() {
