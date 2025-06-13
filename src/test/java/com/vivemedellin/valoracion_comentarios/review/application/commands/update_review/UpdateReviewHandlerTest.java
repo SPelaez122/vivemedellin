@@ -13,6 +13,7 @@ import org.mockito.*;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -30,7 +31,7 @@ class UpdateReviewHandlerTest {
 
     private AutoCloseable closeable;
 
-    private final Long userId = 123L;
+    private final UUID userId = UUID.randomUUID();
     private final Long reviewId = 1L;
 
     @BeforeEach
