@@ -38,8 +38,6 @@ class ReviewControllerTest {
     
     private ReviewController reviewController;
 
-    private static final Long FAKE_USER_ID = 123L;
-
     @BeforeEach
     void setUp() {
         reviewController = new ReviewController(
