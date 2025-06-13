@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.MockedStatic;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,6 +34,8 @@ class ReviewControllerTest {
     @Mock private UpdateReviewHandler updateReviewHandler;
     @Mock private GetUserReviewHandler getUserReviewHandler;
 
+    private static final UUID FAKE_USER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    
     private ReviewController reviewController;
 
     private static final Long FAKE_USER_ID = 123L;
