@@ -1,10 +1,11 @@
-package com.vivemedellin.valoracion_comentarios.review.application.handler;
+package com.vivemedellin.valoracion_comentarios.review.application.commands.update_review;
 
-import com.vivemedellin.valoracion_comentarios.review.application.dto.UpdateReviewDTO;
-import com.vivemedellin.valoracion_comentarios.review.application.mapper.ReviewMapper;
-import com.vivemedellin.valoracion_comentarios.review.domain.exception.ReviewUpdateTimeExceededException;
-import com.vivemedellin.valoracion_comentarios.review.domain.repository.ReviewRepository;
+import com.vivemedellin.valoracion_comentarios.review.dto.ReviewDto;
 import com.vivemedellin.valoracion_comentarios.review.entity.Review;
+import com.vivemedellin.valoracion_comentarios.review.exceptions.NotFoundReviewException;
+import com.vivemedellin.valoracion_comentarios.review.exceptions.UpdateTimeLimitException;
+import com.vivemedellin.valoracion_comentarios.review.mapper.ReviewMapper;
+import com.vivemedellin.valoracion_comentarios.review.repository.ReviewRepository;
 import com.vivemedellin.valoracion_comentarios.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,79 +32,86 @@ class UpdateReviewHandlerTest {
     }
 
     @Test
-    void testUpdateReviewWithin24Hours() {
-        // Arrange
+    void testHandleUpdateReviewSuccessfully() {
         Long reviewId = 1L;
         UUID userId = UUID.randomUUID();
-        Instant createdAt = Instant.now().minus(23, ChronoUnit.HOURS);
+        Instant createdAt = Instant.now().minus(1, ChronoUnit.HOURS);
 
-        // Simulamos usuario y reseña
-        User user = User.builder()
-                .id(userId)
-                .build();
+        User user = new User();
+        user.setId(userId);
 
-        Review review = Review.builder()
-                .id(reviewId)
-                .user(user)
-                .rating(3)
-                .comment("Comentario original")
-                .createdAt(createdAt)
-                .build();
+        Review existingReview = new Review();
+        existingReview.setId(reviewId);
+        existingReview.setUser(user);
+        existingReview.setRating(3);
+        existingReview.setComment("Old comment");
+        existingReview.setCreatedAt(createdAt);
 
-        UpdateReviewDTO updateReviewDTO = UpdateReviewDTO.builder()
-                .rating(5)
-                .comment("Comentario actualizado")
-                .build();
+        Review updatedReview = new Review();
+        updatedReview.setId(reviewId);
+        updatedReview.setUser(user);
+        updatedReview.setRating(5);
+        updatedReview.setComment("New comment");
+        updatedReview.setCreatedAt(createdAt);
 
-        Review updatedReview = Review.builder()
-                .id(reviewId)
-                .user(user)
-                .rating(updateReviewDTO.getRating())
-                .comment(updateReviewDTO.getComment())
-                .createdAt(createdAt)
-                .build();
+        ReviewDto expectedDto = new ReviewDto();
+        expectedDto.setId(reviewId);
+        expectedDto.setUser(user);
+        expectedDto.setRating(5);
+        expectedDto.setComment("New comment");
+        expectedDto.setCreatedAt(createdAt);
 
-        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
-        when(reviewRepository.save(any(Review.class))).thenReturn(updatedReview);
-        when(reviewMapper.toDto(any(Review.class))).thenReturn(updateReviewDTO);
+        UpdateReviewCommand command = new UpdateReviewCommand(reviewId, userId, 5, "New comment");
 
-        // Act
-        UpdateReviewDTO result = updateReviewHandler.handle(reviewId, userId, updateReviewDTO);
+        when(reviewRepository.findByIdAndUserId(reviewId, userId)).thenReturn(Optional.of(existingReview));
+        when(reviewRepository.save(any())).thenReturn(updatedReview);
+        when(reviewMapper.toDTO(updatedReview)).thenReturn(expectedDto);
 
-        // Assert
+        ReviewDto result = updateReviewHandler.handle(command);
+
         assertNotNull(result);
-        assertEquals(updateReviewDTO.getRating(), result.getRating());
-        assertEquals(updateReviewDTO.getComment(), result.getComment());
+        assertEquals(5, result.getRating());
+        assertEquals("New comment", result.getComment());
+        verify(reviewRepository).save(any());
+        verify(reviewMapper).toDTO(any());
     }
 
     @Test
-    void testUpdateReviewAfter24Hours_throwsException() {
-        // Arrange
-        Long reviewId = 1L;
+    void testHandleUpdateTimeLimitExceeded() {
+        Long reviewId = 2L;
         UUID userId = UUID.randomUUID();
         Instant createdAt = Instant.now().minus(25, ChronoUnit.HOURS);
 
-        User user = User.builder()
-                .id(userId)
-                .build();
+        User user = new User();
+        user.setId(userId);
 
-        Review review = Review.builder()
-                .id(reviewId)
-                .user(user)
-                .rating(3)
-                .comment("Comentario original")
-                .createdAt(createdAt)
-                .build();
+        Review oldReview = new Review();
+        oldReview.setId(reviewId);
+        oldReview.setUser(user);
+        oldReview.setRating(2);
+        oldReview.setComment("Too old");
+        oldReview.setCreatedAt(createdAt);
 
-        UpdateReviewDTO updateReviewDTO = UpdateReviewDTO.builder()
-                .rating(4)
-                .comment("Intento fuera de tiempo")
-                .build();
+        UpdateReviewCommand command = new UpdateReviewCommand(reviewId, userId, 4, "Updated");
 
-        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
+        when(reviewRepository.findByIdAndUserId(reviewId, userId)).thenReturn(Optional.of(oldReview));
 
-        // Act & Assert
-        assertThrows(ReviewUpdateTimeExceededException.class,
-                () -> updateReviewHandler.handle(reviewId, userId, updateReviewDTO));
+        assertThrows(UpdateTimeLimitException.class, () -> updateReviewHandler.handle(command));
+        verify(reviewRepository, never()).save(any());
+        verify(reviewMapper, never()).toDTO(any());
+    }
+
+    @Test
+    void testHandleReviewNotFound() {
+        Long reviewId = 3L;
+        UUID userId = UUID.randomUUID();
+
+        UpdateReviewCommand command = new UpdateReviewCommand(reviewId, userId, 4, "Doesn't exist");
+
+        when(reviewRepository.findByIdAndUserId(reviewId, userId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundReviewException.class, () -> updateReviewHandler.handle(command));
+        verify(reviewRepository, never()).save(any());
+        verify(reviewMapper, never()).toDTO(any());
     }
 }
