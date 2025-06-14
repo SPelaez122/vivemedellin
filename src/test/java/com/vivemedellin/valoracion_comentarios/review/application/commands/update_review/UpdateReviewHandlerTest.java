@@ -5,7 +5,7 @@ import com.vivemedellin.valoracion_comentarios.review.dto.ReviewDto;
 import com.vivemedellin.valoracion_comentarios.review.exceptions.NotFoundReviewException;
 import com.vivemedellin.valoracion_comentarios.review.exceptions.UpdateTimeLimitException;
 import com.vivemedellin.valoracion_comentarios.review.mapper.ReviewMapper;
-import com.vivemedellin.valoracion_comentarios.review.model.Review;
+import com.vivemedellin.valoracion_comentarios.review.entity.Review;
 import com.vivemedellin.valoracion_comentarios.review.repository.ReviewRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
