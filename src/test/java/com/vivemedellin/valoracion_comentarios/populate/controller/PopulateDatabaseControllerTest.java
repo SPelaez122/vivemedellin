@@ -35,7 +35,7 @@ class PopulateDatabaseControllerTest {
 
         ResponseEntity<List<CategoryDTO>> response = populateDatabaseController.populateCategories();
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
         assertEquals("Music", response.getBody().get(0).getName());
@@ -54,7 +54,7 @@ class PopulateDatabaseControllerTest {
 
         ResponseEntity<List<OrganizerDTO>> response = populateDatabaseController.populateOrganizers();
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
         assertEquals("Organizer Test", response.getBody().get(0).getFirstName());
