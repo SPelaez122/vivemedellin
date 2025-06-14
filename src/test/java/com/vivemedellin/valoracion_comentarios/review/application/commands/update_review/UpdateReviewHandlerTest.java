@@ -7,6 +7,7 @@ import com.vivemedellin.valoracion_comentarios.review.exceptions.UpdateTimeLimit
 import com.vivemedellin.valoracion_comentarios.review.mapper.ReviewMapper;
 import com.vivemedellin.valoracion_comentarios.review.repository.ReviewRepository;
 import com.vivemedellin.valoracion_comentarios.user.entity.User;
+import com.vivemedellin.valoracion_comentarios.user.dto.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +57,10 @@ class UpdateReviewHandlerTest {
 
         ReviewDto expectedDto = new ReviewDto();
         expectedDto.setId(reviewId);
-        expectedDto.setUser(user);
+        // Assuming you have a UserDto and a way to convert User to UserDto, e.g., a UserMapper or manual mapping
+        UserDto userDto = new UserDto();
+        userDto.setId(userId);
+        expectedDto.setUser(userDto);
         expectedDto.setRating(5);
         expectedDto.setComment("New comment");
         expectedDto.setCreatedAt(createdAt);
