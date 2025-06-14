@@ -12,94 +12,116 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class UpdateReviewHandlerTest {
+public class UpdateReviewHandlerTest {
 
     private ReviewRepository reviewRepository;
     private ReviewMapper reviewMapper;
     private UpdateReviewHandler updateReviewHandler;
+
+    private UUID reviewId;
+    private UUID userId;
 
     @BeforeEach
     void setUp() {
         reviewRepository = mock(ReviewRepository.class);
         reviewMapper = mock(ReviewMapper.class);
         updateReviewHandler = new UpdateReviewHandler(reviewRepository, reviewMapper);
+
+        reviewId = UUID.fromString("123e4567-e89b-12d3-a456-426655440000");
+        userId = UUID.fromString("223e4567-e89b-12d3-a456-556642440000");
     }
 
     @Test
-    void shouldThrowNotFoundReviewExceptionIfReviewDoesNotExist() {
-        UpdateReviewCommand command = new UpdateReviewCommand(1L, 2L, 5, "Buen servicio");
+    void testSuccessfulUpdateReview() {
+        Review review = new Review();
+        review.setId(reviewId);
+        review.setUserId(userId);
+        review.setCreatedAt(Instant.now());
+        review.setRating(3);
+        review.setComment("Comentario original");
 
-        when(reviewRepository.findByIdAndUserId(1L, 2L)).thenReturn(Optional.empty());
+        when(reviewRepository.findByIdAndUserId(reviewId, userId)).thenReturn(Optional.of(review));
+        when(reviewRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
+        when(reviewMapper.toDTO(any())).thenReturn(new ReviewDto());
+
+        UpdateReviewCommand command = new UpdateReviewCommand(reviewId, userId, 4, "Comentario actualizado");
+        ReviewDto result = updateReviewHandler.handle(command);
+
+        assertNotNull(result);
+        assertEquals(4, review.getRating());
+        assertEquals("Comentario actualizado", review.getComment());
+
+        verify(reviewRepository).save(review);
+        verify(reviewMapper).toDTO(review);
+    }
+
+    @Test
+    void testUpdateFailsIfReviewNotFound() {
+        when(reviewRepository.findByIdAndUserId(reviewId, userId)).thenReturn(Optional.empty());
+
+        UpdateReviewCommand command = new UpdateReviewCommand(reviewId, userId, 4, "Comentario");
 
         assertThrows(NotFoundReviewException.class, () -> updateReviewHandler.handle(command));
     }
 
     @Test
-    void shouldThrowUpdateTimeLimitExceptionIfMoreThanOneDayPassed() {
+    void testUpdateFailsIfMoreThanOneDayPassed() {
         Review review = new Review();
-        review.setCreatedAt(Instant.now().minusSeconds(86400 * 2)); // 2 días atrás
+        review.setId(reviewId);
+        review.setUserId(userId);
+        review.setCreatedAt(Instant.now().minusSeconds(60 * 60 * 24 + 1)); // más de 1 día
 
-        when(reviewRepository.findByIdAndUserId(1L, 2L)).thenReturn(Optional.of(review));
+        when(reviewRepository.findByIdAndUserId(reviewId, userId)).thenReturn(Optional.of(review));
 
-        UpdateReviewCommand command = new UpdateReviewCommand(1L, 2L, 4, "Comentario");
+        UpdateReviewCommand command = new UpdateReviewCommand(reviewId, userId, 5, "Intento después de un día");
 
         assertThrows(UpdateTimeLimitException.class, () -> updateReviewHandler.handle(command));
     }
 
     @Test
-    void shouldUpdateRatingAndCommentIfBothProvided() {
+    void testPartialUpdateOnlyRating() {
         Review review = new Review();
+        review.setId(reviewId);
+        review.setUserId(userId);
         review.setCreatedAt(Instant.now());
+        review.setRating(2);
+        review.setComment("Comentario original");
 
-        UpdateReviewCommand command = new UpdateReviewCommand(1L, 2L, 5, "Muy bien");
+        when(reviewRepository.findByIdAndUserId(reviewId, userId)).thenReturn(Optional.of(review));
+        when(reviewRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
+        when(reviewMapper.toDTO(any())).thenReturn(new ReviewDto());
 
-        when(reviewRepository.findByIdAndUserId(1L, 2L)).thenReturn(Optional.of(review));
-        when(reviewRepository.save(review)).thenReturn(review);
-        ReviewDto dto = new ReviewDto();
-        when(reviewMapper.toDTO(review)).thenReturn(dto);
-
+        UpdateReviewCommand command = new UpdateReviewCommand(reviewId, userId, 5, null);
         ReviewDto result = updateReviewHandler.handle(command);
 
-        assertEquals(dto, result);
+        assertNotNull(result);
         assertEquals(5, review.getRating());
-        assertEquals("Muy bien", review.getComment());
+        assertEquals("Comentario original", review.getComment());
     }
 
     @Test
-    void shouldUpdateOnlyRatingIfCommentIsNull() {
+    void testPartialUpdateOnlyComment() {
         Review review = new Review();
+        review.setId(reviewId);
+        review.setUserId(userId);
         review.setCreatedAt(Instant.now());
+        review.setRating(4);
+        review.setComment("Comentario anterior");
 
-        UpdateReviewCommand command = new UpdateReviewCommand(1L, 2L, 4, null);
+        when(reviewRepository.findByIdAndUserId(reviewId, userId)).thenReturn(Optional.of(review));
+        when(reviewRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
+        when(reviewMapper.toDTO(any())).thenReturn(new ReviewDto());
 
-        when(reviewRepository.findByIdAndUserId(1L, 2L)).thenReturn(Optional.of(review));
-        when(reviewRepository.save(review)).thenReturn(review);
-        when(reviewMapper.toDTO(review)).thenReturn(new ReviewDto());
-
+        UpdateReviewCommand command = new UpdateReviewCommand(reviewId, userId, null, "Nuevo comentario");
         ReviewDto result = updateReviewHandler.handle(command);
 
+        assertNotNull(result);
         assertEquals(4, review.getRating());
-        assertNull(review.getComment());
-    }
-
-    @Test
-    void shouldUpdateOnlyCommentIfRatingIsNull() {
-        Review review = new Review();
-        review.setCreatedAt(Instant.now());
-
-        UpdateReviewCommand command = new UpdateReviewCommand(1L, 2L, null, "Solo comentario");
-
-        when(reviewRepository.findByIdAndUserId(1L, 2L)).thenReturn(Optional.of(review));
-        when(reviewRepository.save(review)).thenReturn(review);
-        when(reviewMapper.toDTO(review)).thenReturn(new ReviewDto());
-
-        ReviewDto result = updateReviewHandler.handle(command);
-
-        assertEquals("Solo comentario", review.getComment());
-        assertNull(review.getRating());
+        assertEquals("Nuevo comentario", review.getComment());
     }
 }
