@@ -2,6 +2,7 @@ package com.vivemedellin.valoracion_comentarios.category.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
