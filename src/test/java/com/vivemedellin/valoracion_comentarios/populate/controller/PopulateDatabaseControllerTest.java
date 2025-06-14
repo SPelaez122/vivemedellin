@@ -73,7 +73,7 @@ class PopulateDatabaseControllerTest {
 
         ResponseEntity<EventDto> response = populateDatabaseController.populateEvents();
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Sample Event", response.getBody().getTitle());
 
