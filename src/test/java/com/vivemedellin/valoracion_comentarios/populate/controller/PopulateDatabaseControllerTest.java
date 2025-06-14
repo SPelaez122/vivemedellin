@@ -1,6 +1,6 @@
 package com.vivemedellin.valoracion_comentarios.populate.controller;
 
-
+import org.springframework.http.HttpStatus;
 import com.vivemedellin.valoracion_comentarios.category.dto.CategoryDTO;
 import com.vivemedellin.valoracion_comentarios.event.dto.EventDto;
 import com.vivemedellin.valoracion_comentarios.organizer.dto.OrganizerDTO;
